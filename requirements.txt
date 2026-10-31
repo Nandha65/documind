@@ -1,0 +1,9 @@
+llama-index>=0.10.0
+llama-index-vector-stores-chroma
+llama-index-llms-google-genai
+llama-index-embeddings-google-genai
+llama-index-llms-openai
+llama-index-embeddings-openai
+chromadb>=0.4.0
+streamlit>=1.30.0
+python-dotenv>=1.0.0

@@ -1,0 +1,3 @@
+Project DocuMind is an internal knowledge retrieval engine built in 2026.
+It uses LlamaIndex for indexing, ChromaDB as an in-process vector store, and Streamlit for the user interface.
+The core architect is testing local semantic search capabilities to prevent LLM hallucinations.
