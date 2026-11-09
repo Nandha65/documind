@@ -1,5 +1,5 @@
 import streamlit as st
-from src.pipeline import get_query_engine
+from src.pipeline import data_signature, get_query_engine
 
 st.set_page_config(page_title="DocuMind", page_icon="🤖", layout="wide")
 
@@ -19,13 +19,15 @@ provider_key = PROVIDERS[provider_choice]
 
 # Cache the engine per provider. Exceptions are not cached, so fixing a
 # configuration problem (e.g. a missing API key) takes effect on the next rerun.
-@st.cache_resource(show_spinner=False)
-def load_engine(provider: str):
+# data_version is only part of the cache key: when files in data/ change, a new
+# engine is loaded, and the pipeline re-indexes if their content changed.
+@st.cache_resource(show_spinner=False, max_entries=3)
+def load_engine(provider: str, data_version: tuple):
     return get_query_engine(provider)
 
 try:
     with st.spinner(f"Loading {provider_choice} index & embeddings..."):
-        query_engine = load_engine(provider_key)
+        query_engine = load_engine(provider_key, data_signature())
 except Exception as e:
     st.error(f"⚠️ Error initializing {provider_choice}: {e}")
     st.stop()
