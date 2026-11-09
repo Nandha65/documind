@@ -1,14 +1,17 @@
-llama-index>=0.10.0
-llama-index-vector-stores-chroma
-llama-index-readers-file
-llama-index-llms-google-genai
-google-genai>=1.51.0
-llama-index-embeddings-google-genai
-llama-index-llms-openai
-llama-index-embeddings-openai
-anthropic>=2.6.0
-llama-index-embeddings-fastembed
-fastembed
-chromadb>=0.4.0
-streamlit>=1.31.0
-python-dotenv>=1.0.0
+# Versions this project is tested with. "~=" allows bug-fix (patch) updates only.
+llama-index~=0.14.25
+# src/pipeline.py customises a LlamaIndex chat engine, so pin core explicitly
+llama-index-core~=0.14.25
+llama-index-vector-stores-chroma~=0.6.0
+llama-index-readers-file~=0.7.0
+llama-index-llms-google-genai~=0.11.3
+google-genai~=2.34.0
+llama-index-embeddings-google-genai~=0.6.0
+llama-index-llms-openai~=0.7.10
+llama-index-embeddings-openai~=0.6.0
+anthropic~=2.6.0
+llama-index-embeddings-fastembed~=0.7.0
+fastembed~=0.9.1
+chromadb~=1.5.9
+streamlit~=1.67.0
+python-dotenv~=1.2.4
