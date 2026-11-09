@@ -18,8 +18,17 @@ GEMINI_OVERLOADED = genai_errors.ServerError(503, {"error": {
 }})
 
 
+GEMINI_DAILY_QUOTA = genai_errors.ClientError(429, {"error": {
+    "code": 429, "status": "RESOURCE_EXHAUSTED",
+    "message": "You exceeded your current quota. Quota exceeded for metric: "
+               "generate_content_free_tier_requests, limit: 20. Generate content requests "
+               "per day limit exceeded on Free Tier.",
+}})
+
+
 @pytest.mark.parametrize("error, expected", [
     (GEMINI_OVERLOADED, "Gemini is overloaded right now"),
+    (GEMINI_DAILY_QUOTA, "Gemini's daily quota is used up"),
     (StatusError(529, "Overloaded"), "Gemini is overloaded right now"),
     (StatusError(429, "Too many requests"), "rate limit reached"),
     (StatusError(401, "invalid x-api-key"), "rejected the API key"),

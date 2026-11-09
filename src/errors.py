@@ -10,6 +10,8 @@ def friendly_error(provider: str, error: Exception) -> str:
     if status in (503, 529) or "overloaded" in text.lower() or "UNAVAILABLE" in text:
         return f"{provider} is overloaded right now. Please try again in a moment."
     if status == 429 or "RESOURCE_EXHAUSTED" in text or "rate limit" in text.lower():
+        if "per day" in text.lower() or "perday" in text.lower():
+            return f"{provider}'s daily quota is used up. Try again tomorrow, or switch to another provider."
         return f"{provider} rate limit reached. Wait a minute and try again."
     if status in (401, 403):
         return f"{provider} rejected the API key. Check the key in your .env file."
