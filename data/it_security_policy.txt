@@ -1,0 +1,43 @@
+LUMENFIELD LABS - IT SECURITY POLICY
+Version 2.0, effective August 1, 2026. Policy owner: Daniel Okafor, Head of Security.
+
+This policy applies to all employees, contractors and interns who use company accounts, devices or data.
+
+1. ACCOUNTS AND PASSWORDS
+- Passwords must be at least 14 characters long and must not be reused across services.
+- Store all work passwords in Vaultkeeper, the company password manager.
+- Multi-factor authentication (MFA) is required on every company account. Administrators must use a hardware security key as their second factor.
+- Never share your password or MFA codes, including with the IT team.
+
+2. DEVICES
+- Company laptops must have full-disk encryption turned on.
+- Screens must lock automatically after 5 minutes of inactivity.
+- Operating system and browser security updates must be installed within 7 days of release.
+- Personal devices may access email and Slack only, through the approved mobile apps.
+
+3. DATA CLASSIFICATION
+All company data falls into one of four levels:
+- Public: approved for anyone, such as marketing pages and published documentation.
+- Internal: for employees only, such as this policy, the employee handbook and meeting notes.
+- Confidential: limited to the people who need it, such as contracts, financial results and salary data.
+- Restricted: the most sensitive data. All customer data, including Ledgerly invoices and customer contact details, is Restricted.
+Restricted data must never leave approved production systems, be copied to a laptop, or be shared over chat.
+
+4. AI TOOLS
+- Do not paste Confidential or Restricted data into any external AI tool or chatbot.
+- DocuMind is approved for Public and Internal documents only. Do not add Confidential or Restricted documents to its data folder.
+- New AI tools must be reviewed by the Security team before use with company data.
+
+5. REPORTING INCIDENTS
+- Report any suspected security incident within 1 hour of noticing it. Email security@lumenfield.example or post in the #sec-incidents Slack channel.
+- Lost or stolen devices count as incidents and must also be reported within 1 hour, so the device can be remotely locked and wiped.
+- Forward suspected phishing emails to phishing@lumenfield.example and then delete them. Do not click links or open attachments.
+- The Security team responds to incident reports 24 hours a day, 7 days a week.
+
+6. ACCESS REVIEWS
+Managers review their team's access to systems every quarter. Access is removed on an employee's last working day.
+
+7. TRAINING
+All staff complete IT security training during their first week and a refresher every 12 months.
+
+Breaking this policy may lead to disciplinary action. Questions go to security@lumenfield.example.
