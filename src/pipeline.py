@@ -17,9 +17,12 @@ DB_DIR = str(PROJECT_ROOT / "chroma_db")
 
 def configure_provider(provider: str):
     """Configures LLM and Embedding models based on selected provider."""
+    # Re-read .env so keys added while the app is running are picked up
+    load_dotenv(dotenv_path=env_path)
     provider = provider.lower()
 
     if provider == "gemini":
+        from google.genai import types
         from llama_index.llms.google_genai import GoogleGenAI
         from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 
@@ -27,7 +30,16 @@ def configure_provider(provider: str):
         if not api_key:
             raise ValueError("GOOGLE_API_KEY not found in .env file.")
 
-        llm = GoogleGenAI(model="gemini-3.6-flash", api_key=api_key)
+        # Gemini 3 models default to a high thinking level, which can add several
+        # seconds before any answer text is produced. Answering from retrieved
+        # chunks doesn't need deep reasoning, so keep thinking low.
+        llm = GoogleGenAI(
+            model="gemini-3.6-flash",
+            api_key=api_key,
+            generation_config=types.GenerateContentConfig(
+                thinking_config=types.ThinkingConfig(thinking_level="low"),
+            ),
+        )
         embed_model = GoogleGenAIEmbedding(model_name="gemini-embedding-2-preview", api_key=api_key)
         collection_name = "documind_gemini"
 
@@ -79,10 +91,13 @@ def initialize_index(provider: str = "gemini"):
 
 def get_query_engine(provider: str = "gemini"):
     index, llm = initialize_index(provider=provider)
-    return index.as_query_engine(llm=llm)
+    # Stream tokens as they are generated so the answer starts appearing right
+    # away instead of only after the whole response has been produced.
+    return index.as_query_engine(llm=llm, streaming=True)
 
 if __name__ == "__main__":
     engine = get_query_engine("gemini")
     response = engine.query("What is this document about?")
     print("\n--- Gemini Query Test Result ---")
-    print(response)
+    response.print_response_stream()
+    print()
