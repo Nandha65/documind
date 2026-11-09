@@ -10,6 +10,8 @@ env_path = PROJECT_ROOT / ".env"
 load_dotenv(dotenv_path=env_path)
 
 from llama_index.core import SimpleDirectoryReader, StorageContext, VectorStoreIndex
+from llama_index.core.chat_engine import CondensePlusContextChatEngine
+from llama_index.core.llms import ChatMessage, MessageRole
 from llama_index.vector_stores.chroma import ChromaVectorStore
 import chromadb
 
@@ -18,6 +20,12 @@ DATA_DIR = str(PROJECT_ROOT / "data")
 DB_DIR = str(PROJECT_ROOT / "chroma_db")
 # Content hash of data/ that each collection was built from
 INDEX_STATE_FILE = Path(DB_DIR) / "index_state.json"
+
+# Retrieve more chunks than LlamaIndex's default of 2, so answers that draw on
+# several sections or documents get the context they need.
+SIMILARITY_TOP_K = 4
+# Recent chat messages sent with each question so follow-ups keep their context
+MAX_HISTORY_MESSAGES = 6
 
 
 def _data_files() -> list[Path]:
@@ -153,11 +161,67 @@ def initialize_index(provider: str = "gemini"):
     _store_fingerprint(collection_name, fingerprint)
     return index, llm
 
+class FollowUpChatEngine(CondensePlusContextChatEngine):
+    """Chat engine that searches with the previous question plus the new one.
+
+    LlamaIndex normally asks the LLM to rewrite each follow-up as a standalone
+    question before searching, which adds an LLM call to every question after
+    the first. Searching with the previous question prepended finds the right
+    documents for follow-ups like "who do I ask about it?" at no extra cost.
+    The LLM still answers the question as asked, with the conversation in view.
+    """
+
+    def _condense_question(self, chat_history: list[ChatMessage], latest_message: str) -> str:
+        previous = next(
+            (m.content for m in reversed(chat_history) if m.role == MessageRole.USER), None
+        )
+        return f"{previous}\n{latest_message}" if previous else latest_message
+
+    async def _acondense_question(self, chat_history: list[ChatMessage], latest_message: str) -> str:
+        return self._condense_question(chat_history, latest_message)
+
+
+def stream_answer(index, llm, question: str, history: list[dict]):
+    """Answer a question in the context of the conversation so far.
+
+    history holds earlier {"role", "content"} messages. Returns a streaming
+    chat response with .response_gen (answer tokens) and .source_nodes.
+    """
+    engine = FollowUpChatEngine.from_defaults(
+        retriever=index.as_retriever(similarity_top_k=SIMILARITY_TOP_K),
+        llm=llm,
+    )
+    chat_history = [
+        ChatMessage(role=m["role"], content=m["content"])
+        for m in history[-MAX_HISTORY_MESSAGES:]
+    ]
+    return engine.stream_chat(question, chat_history=chat_history)
+
+
+def format_sources(source_nodes, excerpt_chars: int = 240) -> list[dict]:
+    """One entry per source document (and PDF page) behind an answer, best match first."""
+    sources, seen = [], set()
+    for node_with_score in source_nodes:
+        meta = node_with_score.node.metadata
+        key = (meta.get("file_name", "unknown"), meta.get("page_label"))
+        if key in seen:
+            continue
+        seen.add(key)
+        text = " ".join(node_with_score.node.get_content().split())
+        sources.append({
+            "file": key[0],
+            "page": key[1],
+            "score": node_with_score.score,
+            "excerpt": text[:excerpt_chars] + ("…" if len(text) > excerpt_chars else ""),
+        })
+    return sources
+
+
 def get_query_engine(provider: str = "gemini"):
     index, llm = initialize_index(provider=provider)
     # Stream tokens as they are generated so the answer starts appearing right
     # away instead of only after the whole response has been produced.
-    return index.as_query_engine(llm=llm, streaming=True)
+    return index.as_query_engine(llm=llm, streaming=True, similarity_top_k=SIMILARITY_TOP_K)
 
 if __name__ == "__main__":
     engine = get_query_engine("gemini")
