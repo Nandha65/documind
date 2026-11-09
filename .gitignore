@@ -6,6 +6,9 @@ __pycache__/
 # Local Chroma vector database storage
 chroma_db/
 
+# Local embedding model cache (Claude provider)
+.fastembed_cache/
+
 # Local environment configuration
 .env
 

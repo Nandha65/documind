@@ -55,8 +55,25 @@ def configure_provider(provider: str):
         embed_model = OpenAIEmbedding(model="text-embedding-3-small", api_key=api_key)
         collection_name = "documind_openai"
 
+    elif provider == "claude":
+        from llama_index.embeddings.fastembed import FastEmbedEmbedding
+        from .claude_llm import ClaudeLLM
+
+        api_key = os.getenv("ANTHROPIC_API_KEY")
+        if not api_key:
+            raise ValueError("ANTHROPIC_API_KEY not found in .env file.")
+
+        llm = ClaudeLLM(api_key=api_key)
+        # Anthropic has no embeddings API, so embed locally. This also avoids a
+        # network round trip for every question (~2 ms instead of ~300 ms).
+        embed_model = FastEmbedEmbedding(
+            model_name="BAAI/bge-small-en-v1.5",
+            cache_dir=str(PROJECT_ROOT / ".fastembed_cache"),
+        )
+        collection_name = "documind_claude"
+
     else:
-        raise ValueError(f"Unsupported provider: {provider}. Choose 'gemini' or 'openai'.")
+        raise ValueError(f"Unsupported provider: {provider}. Choose 'gemini', 'openai' or 'claude'.")
 
     return llm, embed_model, collection_name
 

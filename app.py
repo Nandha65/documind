@@ -4,16 +4,18 @@ from src.pipeline import get_query_engine
 st.set_page_config(page_title="DocuMind", page_icon="🤖", layout="wide")
 
 st.title("🤖 DocuMind: Multi-Provider RAG Assistant")
-st.write("Query your local documents with either **Google Gemini** or **OpenAI**.")
+st.write("Query your local documents with **Google Gemini**, **OpenAI** or **Anthropic Claude**.")
+
+PROVIDERS = {"Google Gemini": "gemini", "OpenAI": "openai", "Anthropic Claude": "claude"}
 
 # Sidebar Provider Selection
 st.sidebar.header("Model Settings")
 provider_choice = st.sidebar.selectbox(
     "Select AI Provider:",
-    ("Google Gemini", "OpenAI"),
+    tuple(PROVIDERS),
     index=0
 )
-provider_key = "gemini" if provider_choice == "Google Gemini" else "openai"
+provider_key = PROVIDERS[provider_choice]
 
 # Cache the engine per provider. Exceptions are not cached, so fixing a
 # configuration problem (e.g. a missing API key) takes effect on the next rerun.

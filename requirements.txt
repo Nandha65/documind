@@ -5,6 +5,9 @@ google-genai>=1.51.0
 llama-index-embeddings-google-genai
 llama-index-llms-openai
 llama-index-embeddings-openai
+anthropic>=2.6.0
+llama-index-embeddings-fastembed
+fastembed
 chromadb>=0.4.0
 streamlit>=1.31.0
 python-dotenv>=1.0.0
