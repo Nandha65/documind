@@ -1,7 +1,11 @@
+import logging
 import re
 
 import streamlit as st
+from src.errors import friendly_error
 from src.pipeline import data_signature, format_sources, initialize_index, stream_answer
+
+logger = logging.getLogger(__name__)
 
 # Characters Streamlit would treat as Markdown (or LaTeX, for "$")
 _MARKDOWN_CHARS = re.compile(r"([\\`*_{}\[\]()#+\-.!|>~<$])")
@@ -68,11 +72,22 @@ if prompt := st.chat_input("Ask a question about your documents..."):
     st.session_state.messages.append({"role": "user", "content": prompt})
 
     with st.chat_message("assistant"):
-        with st.spinner(f"Querying via {provider_choice}..."):
-            response = stream_answer(index, llm, prompt, history)
-        # Render tokens as they arrive instead of waiting for the full answer
-        answer = st.write_stream(response.response_gen)
-        sources = format_sources(response.source_nodes)
-        show_sources(sources)
+        try:
+            with st.spinner(f"Querying via {provider_choice}..."):
+                response = stream_answer(index, llm, prompt, history)
+            # Render tokens as they arrive instead of waiting for the full answer
+            answer = st.write_stream(response.response_gen)
+            sources = format_sources(response.source_nodes)
+            show_sources(sources)
+        except Exception as e:
+            # Rate limits, overloaded models and network errors: explain instead
+            # of showing a traceback. The full error still goes to the terminal.
+            logger.exception("Query via %s failed", provider_choice)
+            st.error(f"⚠️ {friendly_error(provider_choice, e)}")
+            answer = None
 
-    st.session_state.messages.append({"role": "assistant", "content": answer, "sources": sources})
+    if answer is None:
+        # Drop the unanswered question so it isn't sent as history next time
+        st.session_state.messages.pop()
+    else:
+        st.session_state.messages.append({"role": "assistant", "content": answer, "sources": sources})
