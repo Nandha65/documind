@@ -182,7 +182,7 @@ Building a commercial product? **[PlanForge](https://planforge.web.app)** is a T
 spatial layout editors and interactive grid planners: drag-and-drop layouts, snapping, live pricing and print-ready
 vector PDF export.
 
-- [Try the live demo](https://planforge.web.app): six industry planners on one engine
+- [Try the live demo](https://planforge.web.app): seven workspace presets on one engine, including solar rooftop and event hall
 - [Get the source code](https://nandha4.gumroad.com/l/planforge) ($49 one-time), or
   [sponsor on GitHub](https://github.com/sponsors/Nandha65) ($29/month) for repo access and every update
 
