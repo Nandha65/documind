@@ -178,12 +178,12 @@ pytest
 
 ## Production Starter Kits
 
-Building a commercial product? **[Canvas Engine 2D](https://canvas-engine-2d.web.app)** is a TypeScript engine for
-interactive 2D configurators and floor planners: drag-and-drop layouts, snapping, live pricing and print-ready
+Building a commercial product? **[PlanForge](https://planforge.web.app)** is a TypeScript engine for
+spatial layout editors and interactive grid planners: drag-and-drop layouts, snapping, live pricing and print-ready
 vector PDF export.
 
-- [Try the live demo](https://canvas-engine-2d.web.app): six industry configurators on one engine
-- [Get the source code](https://nandha4.gumroad.com/l/canvas-engine-2d) ($49 one-time), or
+- [Try the live demo](https://planforge.web.app): six industry planners on one engine
+- [Get the source code](https://nandha4.gumroad.com/l/planforge) ($49 one-time), or
   [sponsor on GitHub](https://github.com/sponsors/Nandha65) ($29/month) for repo access and every update
 
 ---
